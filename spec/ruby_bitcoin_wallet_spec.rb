@@ -34,7 +34,9 @@ describe RubyBitcoinWallet do
 
       it 'access address balance' do
         balance = @wallet.address_balance(test_address)
-        expect(balance).to be_a_kind_of(Integer)
+        expect(balance[:final_balance]).to be_a_kind_of(Integer)
+        expect(balance[:total_received]).to be_a_kind_of(Integer)
+        expect(balance[:total_sent]).to be_a_kind_of(Integer)
       end
 
       it 'access address transactions' do
