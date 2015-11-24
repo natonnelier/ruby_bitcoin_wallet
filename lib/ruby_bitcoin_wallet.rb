@@ -3,6 +3,7 @@ require "ruby_bitcoin_wallet/version"
 require 'openssl'
 require 'ruby_bitcoin_wallet/util'
 require 'ruby_bitcoin_wallet/open_ssl'
+require 'ruby_bitcoin_wallet/api_service'
 
 module RubyBitcoinWallet
 
@@ -125,6 +126,22 @@ module RubyBitcoinWallet
     return false unless hex && hex.bytesize == 50
     return false unless [address_version, p2sh_version].include?(hex[0...2])
     Util.base58_checksum?(address)
+  end
+
+  def balance_and_transactions(address)
+    ApiService.address_balance_and_transactions(address)
+  end
+
+  def address_balance(address)
+    address_balance_and_txs = balance_and_transactions(address)
+    return address_balance_and_txs unless address_balance_and_txs['final_balance']
+    address_balance_and_txs['final_balance']
+  end
+
+  def address_transactions(address)
+    address_balance_and_txs = balance_and_transactions(address)
+    return address_balance_and_txs unless address_balance_and_txs['txs']
+    address_balance_and_txs['txs']
   end
 
   def address_version; NETWORKS[:bitcoin][:address_version]; end

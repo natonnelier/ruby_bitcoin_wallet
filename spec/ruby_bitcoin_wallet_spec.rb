@@ -1,24 +1,61 @@
 require 'spec_helper'
 
 describe RubyBitcoinWallet do
-  subject { RubyBitcoinWallet.new }
+  class Wallet
+  end
 
-  describe '#process' do
-    let(:input) { 'My input.' }
-    let(:output) { subject.process(input) }
+  before(:all) do
+    @wallet = Wallet.new
+    @wallet.extend RubyBitcoinWallet
+  end
 
-    it 'creates private and public keys' do
-      # expect(output.downcase).to eq output
+  describe 'Creating keys and address' do
+    let(:keys) { @wallet.generate_key }
+    let(:address) { @wallet.pubkey_to_address(keys[1]) }
+
+    it 'generate_key returns valid strings' do
+      expect(keys[0]).to be_a_kind_of(String)
+      expect(keys[1]).to be_a_kind_of(String)
     end
 
-    it 'creates address' do
-      # expect(output).to match /so grandmom./i
-      # expect(output).to match /such sweater./i
-      # expect(output).to match /very christmas./i
+    it 'creates address from public key' do
+      expect(address).to be_a_kind_of(String)
+      expect(address[0]).to eq('1').or eq('3')
     end
 
-    it 'returns error message' do
-      # expect(output).to end_with 'wow.'
+    it 'checks address validity' do
+      expect(@wallet.valid_address?(address)).to be(true)
+    end
+  end
+
+  describe 'Return blockchain data' do
+    context 'with valid address' do
+      let(:test_address) { '1HawYer58J9Vy3iju1w7jsRVci5tzaxkwn' }
+
+      it 'access address balance' do
+        balance = @wallet.address_balance(test_address)
+        expect(balance).to be_a_kind_of(Integer)
+      end
+
+      it 'access address transactions' do
+        transactions = @wallet.address_transactions(test_address)
+        expect(transactions).to be_a_kind_of(Array)
+        expect(transactions.first['hash']).to be_a_kind_of(String)
+      end
+    end
+
+    context 'with invalid address' do
+      let(:test_address) { '2566358J9Vy3iju1w7jsRVci5tzaxkwn' }
+
+      it 'access address balance' do
+        balance = @wallet.address_balance(test_address)
+        expect(balance).to eq("No data registered for address #{test_address}")
+      end
+
+      it 'access address transactions' do
+        transactions = @wallet.address_transactions(test_address)
+        expect(transactions).to eq("No data registered for address #{test_address}")
+      end
     end
   end
 end
