@@ -24,14 +24,27 @@ Or install it yourself as:
 Create public and private key's hash:
 
 keys = RubyBitcoinWallet::generate_key
+keys #=> [<privkey>, <pubkey>]
 
 Generate Address:
 
 address = RubyBitcoinWallet::pubkey_to_address(keys[1])
+address #=> <bitcoin address>
 
 Check if address is valid:
 
-RubyBitcoinWallet::valid_address?(address)
+RubyBitcoinWallet::valid_address?(address) #=> true
+
+Get Address' balance:
+
+RubyBitcoinWallet::address_balance(address)
+address_balance #=> { [:final_balance], [:total_received], [:total_sent] }
+
+Get address' transactions:
+
+address_txs = RubyBitcoinWallet::address_transactions(address)
+address_txs #=> [ <tx1_hash>, <tx2_hash>, ... ]
+
 
 ## Contributing
 
